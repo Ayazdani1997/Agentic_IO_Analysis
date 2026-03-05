@@ -1,0 +1,5 @@
+1. Write intensive; only 2 MB for reading the input file
+2. All the files perform independent I/O to the header and Cell_D_* files (No rank -1 appears in the darshan log); every file is accessed by a unique rank
+3. The accesses are sequential within each rank (To both the headers and Cell_D_* files); often sequential writes (POSIX_SEQ_WRITES)
+with transfer size 1M-4M (According to POSIX_SIZE_WRITE_1M_4M) for cell_D_* files, and Header files (Either Cell_H or *_MF_H with sizes less than 1 MB)
+4. All the ranks write small amount of data (Less than 1 GB) per file (Less than 10 MB)
