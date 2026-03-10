@@ -14,6 +14,7 @@
 
 module load python
 module load gpu
+module load cuda/12.4
 
 VENV_DIR="$SCRATCH/agentic_venv"
 
@@ -22,14 +23,18 @@ if [ ! -d "$VENV_DIR" ]; then
 fi
 
 source "$VENV_DIR/bin/activate"
+REPO_HUB=$(pwd)
+SRC="$REPO_HUB/src"
 pip install -r requirements.txt
 
-export HUGGINGFACEHUB_API_TOKEN=hf_xxxxxxxxx ## CHANGE THIS LINE
+# export HUGGINGFACEHUB_API_TOKEN=hf_xxxxxxxxx ## CHANGE THIS LINE
+
+export HF_HOME=$REPO_HUB/.cache
 
 srun --nodes=1 \
     --ntasks-per-node=1 \
     --gres=gpu:4 \
-    python darshan_agent_with_context.py --model_id openai/gpt-oss-20b \
+    python $SRC/darshan_agent_with_context.py --model_id openai/gpt-oss-20b \
     --dataset_dir dataset \
     --log_dir darshan_llm_logs \
     Castro_large.txt

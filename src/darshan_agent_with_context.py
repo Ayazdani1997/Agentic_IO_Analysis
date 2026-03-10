@@ -3,6 +3,7 @@
 import os
 # os.environ["HUGGINGFACEHUB_API_TOKEN"] = "SOMETHING" IMPORTANT, THIS LINE MUST BE CONFIGURED
 
+FILE_STEP = 80
 # NOTE: This snippet was adapted from the ION project:
 # https://github.com/DIR-LAB/ION
 
@@ -509,7 +510,7 @@ pipe = pipeline(
     "text-generation",
     model=model,
     tokenizer=tokenizer,
-    max_new_tokens=2048,
+    max_new_tokens=32768,
     # temperature=0.01,
     return_full_text=False   # 🔥 This is the fix
 )
@@ -682,12 +683,12 @@ past_history = {
 
 performance_results_per_range = {}
 
-for i in range(0, len(aggregate_bytes_ioed), 5):
+for i in range(0, len(aggregate_bytes_ioed), FILE_STEP):
     ''' BEGIN prompt for checking read/write, shared/independent and
         huge/small
     '''
     start_idx = i 
-    end_idx = min(i + 5, len(aggregate_bytes_ioed))
+    end_idx = min(i + FILE_STEP, len(aggregate_bytes_ioed))
     prompts = []
     contexts = []
     performance_results = {}
@@ -725,8 +726,7 @@ for i in range(0, len(aggregate_bytes_ioed), 5):
     """
     prompt_1 = (
         "Given these Darshan counters, answer the questions:\n"
-        f"{aggregate_bytes_ioed.iloc[start_idx:end_idx
-        ].to_string()}\n\n"
+        f"{aggregate_bytes_ioed.iloc[start_idx:end_idx].to_string()}\n\n"
         "QUESTION\n"
         "Q1: How many files receive shared vs independent access?\n"
         "Q2: How many files receieve only read, how many do only write, and how many do both read and write?\n"
@@ -960,7 +960,7 @@ for i in range(0, len(aggregate_bytes_ioed), 5):
         for j, (context, prompt, response) in enumerate(\
             zip(contexts, prompts, responses), start=1):
 
-            f.write(f"============BEGIN FILE RANGE ({i}, {min((i + 5), len(aggregate_bytes_ioed))} ===========\n\n")
+            f.write(f"============BEGIN FILE RANGE ({i}, {min((i + FILE_STEP), len(aggregate_bytes_ioed))}) ===========\n\n")
 
             f.write(f"----- CONTEXT {j} -----\n")
             f.write(f"Timestamp: {datetime.now()}\n")
@@ -974,7 +974,7 @@ for i in range(0, len(aggregate_bytes_ioed), 5):
             f.write(f"Timestamp: {datetime.now()}\n")
             f.write(response + "\n")
 
-            f.write(f"============ END FILE RANGE ({i}, {min((i + 5), len(aggregate_bytes_ioed))} ===========\n\n")
+            f.write(f"============ END FILE RANGE ({i}, {min((i + FILE_STEP), len(aggregate_bytes_ioed))}) ===========\n\n")
 
 
     with open(performance_path, "a", encoding="utf-8") as f:
@@ -989,7 +989,7 @@ for i in range(0, len(aggregate_bytes_ioed), 5):
                 return obj.tolist()
             return obj
 
-        f.write(f"============BEGIN FILE RANGE ({i}, {min((i + 5), len(aggregate_bytes_ioed))}))===========\n\n")
+        f.write(f"============BEGIN FILE RANGE ({i}, {min((i + FILE_STEP), len(aggregate_bytes_ioed))}))===========\n\n")
         for result_key, result_val in performance_results.items():
             print(f">>>>>>>>>  BEGIN {result_key} <<<<<<<<<", file=f)
             print(
@@ -1004,7 +1004,7 @@ for i in range(0, len(aggregate_bytes_ioed), 5):
             print(file=f)
             print_accuracy_stat(result_val, log_file=f)
             print(f">>>>>>>>>  END {result_key} <<<<<<<<<", file=f)
-        f.write(f"============END FILE RANGE ({i}, {min((i + 5), len(aggregate_bytes_ioed))}))===========\n\n")
+        f.write(f"============END FILE RANGE ({i}, {min((i + FILE_STEP), len(aggregate_bytes_ioed))}))===========\n\n")
 
 
 

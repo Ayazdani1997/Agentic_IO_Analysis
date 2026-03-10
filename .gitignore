@@ -36,6 +36,11 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
+
+# Exec log
+
+darshan_llm_logs/**
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
