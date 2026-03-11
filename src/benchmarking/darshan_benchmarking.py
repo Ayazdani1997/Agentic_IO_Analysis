@@ -397,13 +397,16 @@ def report_accuracy_summarization(response, darshan_csv, past_history, pattern_1
         perf_result = checker(pattern_1, darshan_csv, file_list, module)
         for key, val in perf_result.items():
             checker_results[key] = {}
-            checker_results[key]['expected'] = val['expected'] + past_history[key]
+            checker_results[key]['expected'] = val['expected']
 
     for name, checker in pattern_2_checkers.items():
         perf_result = checker(pattern_2, darshan_csv, file_list, module)
         for key, val in perf_result.items():
             checker_results[key] = {}
-            checker_results[key]['expected'] = val['expected'] + past_history[key]
+            checker_results[key]['expected'] = val['expected']
+
+    for key, val in past_history.items():
+        checker_results[key]['expected'] += val
 
 
     try: 

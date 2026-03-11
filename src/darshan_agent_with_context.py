@@ -3,7 +3,7 @@
 import os
 # os.environ["HUGGINGFACEHUB_API_TOKEN"] = "SOMETHING" IMPORTANT, THIS LINE MUST BE CONFIGURED
 
-FILE_STEP = 80
+FILE_STEP = 100
 # NOTE: This snippet was adapted from the ION project:
 # https://github.com/DIR-LAB/ION
 
@@ -945,7 +945,7 @@ for i in range(0, len(aggregate_bytes_ioed), FILE_STEP):
 
     for key, val in summarization_performance.items():
         new_val = summarization_performance[key]['output']
-        past_history[key] += new_val
+        past_history[key] = new_val
 
 
     performance_results_per_range[(start_idx, end_idx)] = performance_results
@@ -1034,12 +1034,9 @@ for method, vals in total_accuracy_scores.items():
     output = vals["output"]
     expected = vals["expected"]
 
-    accuracy = output / expected if expected != 0 else "Undef"
-
     summary[method] = {
         "total_output": output,
         "total_expected": expected,
-        "accuracy": accuracy
     }
 
 # -----------------------------
